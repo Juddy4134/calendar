@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Shift Calendar iOS Fix</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial;}
+body{background:#0f172a;color:#fff;padding:12px;}
+.app{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:10px;}
+.title{font-size:18px;font-weight:700;}
+.nav{display:grid;grid-template-columns:1fr 2fr 1fr;gap:8px;margin-top:10px;}
+button{background:#1e293b;border:none;color:#fff;padding:10px;border-radius:10px;}
+.calendar{background:#111827;padding:10px;border-radius:16px;margin-top:10px;}
+.month{text-align:center;font-weight:700;margin-bottom:10px;}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.day{min-height:72px;border-radius:10px;padding:4px;font-size:12px;display:flex;flex-direction:column;justify-content:space-between;}
+.empty{background:transparent;}
+.work{background:#facc15;color:#000;}
+.night{background:#3b82f6;}
+.off{background:#16a34a;}
+.num{font-weight:700;font-size:14px;}
+.pay{font-size:10px;opacity:.9;}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <div class="header">
+    <div class="title">График смен</div>
+
+    <div class="nav">
+      <button id="prev">◀</button>
+      <button id="today">Сегодня</button>
+      <button id="next">▶</button>
+    </div>
+  </div>
+
+  <div class="calendar">
+    <div class="month" id="month"></div>
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+
+<script>
+const base = new Date(2026,4,11);
+
+let current = new Date();
+
+const cycle = [
+ {label:"day",class:"work",h:12},
+ {label:"night",class:"night",h:4},
+ {label:"rest",class:"off",h:8},
+ {label:"off",class:"off",h:0}
+];
+
+function shift(d){
+ const diff = Math.floor((d-base)/86400000);
+ return cycle[((diff%4)+4)%4];
+}
+
+function render(){
+ const grid=document.getElementById("grid");
+ if(!grid) return;
+
+ const y=current.getFullYear();
+ const m=current.getMonth();
+
+ document.getElementById("month").innerText=
+ current.toLocaleString("ru",{month:"long",year:"numeric"});
+
+
+ grid.innerHTML="";
+
+ const first=new Date(y,m,1);
+ let start=first.getDay()||7;
+ start--;
+
+ for(let i=0;i<start;i++){
+  grid.insertAdjacentHTML("beforeend","<div class='day empty'></div>");
+ }
+
+ const last=new Date(y,m+1,0).getDate();
+
+ for(let d=1;d<=last;d++){
+  const s=shift(new Date(y,m,d));
+
+  grid.insertAdjacentHTML("beforeend",`
+   <div class="day ${s.class}">
+    <div class="num">${d}</div>
+    <div>${s.label}</div>
+   </div>
+  `);
+ }
+}
+
+document.getElementById("prev").onclick=()=>{current.setMonth(current.getMonth()-1);render();};
+document.getElementById("next").onclick=()=>{current.setMonth(current.getMonth()+1);render();};
+document.getElementById("today").onclick=()=>{current=new Date();render();};
+
+window.addEventListener("load",render);
+</script>
+
+</body>
+</html>
