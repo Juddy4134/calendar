@@ -5,22 +5,14 @@
 
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<link rel="manifest" href="manifest.json">
 
-<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-192.png">
-
-<meta name="theme-color" content="#0f172a">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Calendar">
 <meta name="theme-color" content="#0f172a"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Shift Calendar"/>
 
-<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-192.png">
 
 <title>Shift Calendar</title>
 
@@ -29,17 +21,24 @@ content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   box-sizing:border-box;
   margin:0;
   padding:0;
-  font-family:Arial;
+  font-family:Arial,sans-serif;
+}
+
+html,
+body{
+  width:100%;
+  overflow-x:hidden;
+  background:#0f172a;
+  color:#fff;
 }
 
 body{
-  background:#0f172a;
-  color:#fff;
   padding:12px;
   min-height:100vh;
 }
 
 .app{
+  width:100%;
   max-width:720px;
   margin:0 auto;
 }
@@ -65,16 +64,18 @@ button{
   background:#1e293b;
   border:none;
   color:#fff;
-  padding:12px;
+  padding:10px;
   border-radius:12px;
-  font-size:16px;
+  font-size:14px;
   cursor:pointer;
-  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color:transparent;
 }
 
 .calendar{
+  width:100%;
+  overflow:hidden;
   background:#111827;
-  padding:10px;
+  padding:8px;
   border-radius:16px;
   margin-top:10px;
 }
@@ -89,18 +90,36 @@ button{
 
 .grid{
   display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:6px;
+
+  grid-template-columns:repeat(7,minmax(0,1fr));
+
+  gap:4px;
+
+  width:100%;
+
+  overflow:hidden;
 }
 
 .day{
-  min-height:72px;
-  border-radius:10px;
-  padding:4px;
-  font-size:12px;
+  min-width:0;
+
+  width:100%;
+
+  aspect-ratio:1/1;
+
+  border-radius:8px;
+
+  padding:3px;
+
+  font-size:10px;
+
   display:flex;
+
   flex-direction:column;
+
   justify-content:space-between;
+
+  overflow:hidden;
 }
 
 .empty{
@@ -122,11 +141,11 @@ button{
 
 .num{
   font-weight:700;
-  font-size:14px;
+  font-size:12px;
 }
 
 .today{
-  outline:3px solid white;
+  outline:2px solid #fff;
 }
 
 @media (display-mode: standalone){
@@ -177,6 +196,7 @@ function shift(d){
 
 function isToday(y,m,d){
  const t = new Date();
+
  return (
    t.getFullYear() === y &&
    t.getMonth() === m &&
@@ -217,7 +237,8 @@ function render(){
 
   const s=shift(new Date(y,m,d));
 
-  const todayClass = isToday(y,m,d)
+  const todayClass =
+    isToday(y,m,d)
     ? "today"
     : "";
 
@@ -247,7 +268,6 @@ document.getElementById("today").onclick = () => {
 
 window.addEventListener("load",render);
 
-// PWA SW
 if("serviceWorker" in navigator){
  navigator.serviceWorker.register("./sw.js");
 }
