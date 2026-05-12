@@ -2,32 +2,137 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Shift Calendar iOS Fix</title>
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+
+<meta name="theme-color" content="#0f172a"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Shift Calendar"/>
+
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+
+<title>Shift Calendar</title>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial;}
-body{background:#0f172a;color:#fff;padding:12px;}
-.app{max-width:720px;margin:0 auto;}
-.header{text-align:center;margin-bottom:10px;}
-.title{font-size:18px;font-weight:700;}
-.nav{display:grid;grid-template-columns:1fr 2fr 1fr;gap:8px;margin-top:10px;}
-button{background:#1e293b;border:none;color:#fff;padding:10px;border-radius:10px;}
-.calendar{background:#111827;padding:10px;border-radius:16px;margin-top:10px;}
-.month{text-align:center;font-weight:700;margin-bottom:10px;}
-.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
-.day{min-height:72px;border-radius:10px;padding:4px;font-size:12px;display:flex;flex-direction:column;justify-content:space-between;}
-.empty{background:transparent;}
-.work{background:#facc15;color:#000;}
-.night{background:#3b82f6;}
-.off{background:#16a34a;}
-.num{font-weight:700;font-size:14px;}
-.pay{font-size:10px;opacity:.9;}
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial;
+}
+
+body{
+  background:#0f172a;
+  color:#fff;
+  padding:12px;
+  min-height:100vh;
+}
+
+.app{
+  max-width:720px;
+  margin:0 auto;
+}
+
+.header{
+  text-align:center;
+  margin-bottom:10px;
+}
+
+.title{
+  font-size:20px;
+  font-weight:700;
+}
+
+.nav{
+  display:grid;
+  grid-template-columns:1fr 2fr 1fr;
+  gap:8px;
+  margin-top:10px;
+}
+
+button{
+  background:#1e293b;
+  border:none;
+  color:#fff;
+  padding:12px;
+  border-radius:12px;
+  font-size:16px;
+  cursor:pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.calendar{
+  background:#111827;
+  padding:10px;
+  border-radius:16px;
+  margin-top:10px;
+}
+
+.month{
+  text-align:center;
+  font-weight:700;
+  margin-bottom:10px;
+  font-size:18px;
+  text-transform:capitalize;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:6px;
+}
+
+.day{
+  min-height:72px;
+  border-radius:10px;
+  padding:4px;
+  font-size:12px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+.empty{
+  background:transparent;
+}
+
+.work{
+  background:#facc15;
+  color:#000;
+}
+
+.night{
+  background:#3b82f6;
+}
+
+.off{
+  background:#16a34a;
+}
+
+.num{
+  font-weight:700;
+  font-size:14px;
+}
+
+.today{
+  outline:3px solid white;
+}
+
+@media (display-mode: standalone){
+  body{
+    padding-top:calc(env(safe-area-inset-top) + 10px);
+  }
+}
 </style>
 </head>
 
 <body>
+
 <div class="app">
+
   <div class="header">
     <div class="title">График смен</div>
 
@@ -42,6 +147,7 @@ button{background:#1e293b;border:none;color:#fff;padding:10px;border-radius:10px
     <div class="month" id="month"></div>
     <div class="grid" id="grid"></div>
   </div>
+
 </div>
 
 <script>
@@ -50,10 +156,10 @@ const base = new Date(2026,4,11);
 let current = new Date();
 
 const cycle = [
- {label:"day",class:"work",h:12},
- {label:"night",class:"night",h:4},
- {label:"rest",class:"off",h:8},
- {label:"off",class:"off",h:0}
+ {label:"День",class:"work"},
+ {label:"Ночь",class:"night"},
+ {label:"Отдых",class:"off"},
+ {label:"Выходной",class:"off"}
 ];
 
 function shift(d){
@@ -61,34 +167,54 @@ function shift(d){
  return cycle[((diff%4)+4)%4];
 }
 
+function isToday(y,m,d){
+ const t = new Date();
+ return (
+   t.getFullYear() === y &&
+   t.getMonth() === m &&
+   t.getDate() === d
+ );
+}
+
 function render(){
+
  const grid=document.getElementById("grid");
- if(!grid) return;
 
  const y=current.getFullYear();
  const m=current.getMonth();
 
- document.getElementById("month").innerText=
- current.toLocaleString("ru",{month:"long",year:"numeric"});
-
+ document.getElementById("month").innerText =
+ current.toLocaleString("ru",{
+   month:"long",
+   year:"numeric"
+ });
 
  grid.innerHTML="";
 
  const first=new Date(y,m,1);
- let start=first.getDay()||7;
+
+ let start=first.getDay() || 7;
  start--;
 
  for(let i=0;i<start;i++){
-  grid.insertAdjacentHTML("beforeend","<div class='day empty'></div>");
+  grid.insertAdjacentHTML(
+    "beforeend",
+    "<div class='day empty'></div>"
+  );
  }
 
  const last=new Date(y,m+1,0).getDate();
 
- for(let d=1;d<=last;d++){
+ for(let d=1; d<=last; d++){
+
   const s=shift(new Date(y,m,d));
 
+  const todayClass = isToday(y,m,d)
+    ? "today"
+    : "";
+
   grid.insertAdjacentHTML("beforeend",`
-   <div class="day ${s.class}">
+   <div class="day ${s.class} ${todayClass}">
     <div class="num">${d}</div>
     <div>${s.label}</div>
    </div>
@@ -96,11 +222,27 @@ function render(){
  }
 }
 
-document.getElementById("prev").onclick=()=>{current.setMonth(current.getMonth()-1);render();};
-document.getElementById("next").onclick=()=>{current.setMonth(current.getMonth()+1);render();};
-document.getElementById("today").onclick=()=>{current=new Date();render();};
+document.getElementById("prev").onclick = () => {
+ current.setMonth(current.getMonth()-1);
+ render();
+};
+
+document.getElementById("next").onclick = () => {
+ current.setMonth(current.getMonth()+1);
+ render();
+};
+
+document.getElementById("today").onclick = () => {
+ current = new Date();
+ render();
+};
 
 window.addEventListener("load",render);
+
+// PWA SW
+if("serviceWorker" in navigator){
+ navigator.serviceWorker.register("./sw.js");
+}
 </script>
 
 </body>
