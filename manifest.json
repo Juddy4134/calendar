@@ -1,8 +1,8 @@
 {
   "name": "Shift Calendar",
   "short_name": "Calendar",
-  "start_url": "/shift-calendar/",
-  "scope": "/shift-calendar/",
+  "start_url": "/calendar/index.html",
+  "scope": "/calendar/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0f172a",
